@@ -1,0 +1,25 @@
+# Redpanda: un broker compatible con la API de Kafka, más liviano de correr.
+# Tu código usa la librería de Kafka normal; no sabe que es Redpanda.
+services:
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:latest
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --smp 1
+      - --memory 1G
+      - --mode dev-container
+    ports:
+      - "19092:19092"
+
+  # Interfaz web para ver tópicos, particiones, mensajes y consumidores.
+  console:
+    image: docker.redpanda.com/redpandadata/console:latest
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redpanda
